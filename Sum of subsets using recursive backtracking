@@ -1,0 +1,72 @@
+#include <stdio.h>
+typedef struct {
+    int data[MAX_ELEMENTS];
+    int size;
+} Subset;
+
+// Global array to store all valid subsets found during backtracking
+Subset allResults[MAX_SUBSETS];
+int resultCount = 0;
+
+// Temporary array to hold the current path/subset
+int currentSubset[MAX_ELEMENTS];
+int currentSize = 0;
+
+// Recursive backtracking function to find all valid subsets
+void findSubsets(int index, int currentSum, int targetSum, int* elements, int n) {
+    // Base Case: If we have processed all elements
+    if (index == n) {
+        if (currentSum == targetSum) {
+            // Save the valid subset to our results collection
+            allResults[resultCount].size = currentSize;
+            for (int i = 0; i < currentSize; i++) {
+                allResults[resultCount].data[i] = currentSubset[i];
+            }
+            resultCount++;
+        }
+        return;
+    }
+
+    // Choice 1: Include the current element
+    currentSubset[currentSize] = elements[index];
+    currentSize++;
+    findSubsets(index + 1, currentSum + elements[index], targetSum, elements, n);
+    currentSize--; // Backtrack
+
+    // Choice 2: Exclude the current element
+    findSubsets(index + 1, currentSum, targetSum, elements, n);
+}
+
+int main() {
+    int n;
+    if (scanf("%d", &n) != 1) return 0;
+
+    int elements[MAX_ELEMENTS];
+    for (int i = 0; i < n; i++) {
+        if (scanf("%d", &elements[i]) != 1) return 0;
+    }
+
+    int targetSum;
+    if (scanf("%d", &targetSum) != 1) return 0;
+
+    // Start backtracking from index 0 with an initial sum of 0
+    findSubsets(0, 0, targetSum, elements, n);
+
+    // If no valid subset was discovered, print "-1"
+    if (resultCount == 0) {
+        printf("-1\n");
+    } else {
+        // Print the subsets in reverse order of discovery
+        for (int i = resultCount - 1; i >= 0; i--) {
+            for (int j = 0; j < allResults[i].size; j++) {
+                // Print every element followed by a space
+                printf("%d ", allResults[i].data[j]);
+            }
+            // Move to the next line
+            printf("\n");
+        }
+    }
+
+    return 0;
+}
+
